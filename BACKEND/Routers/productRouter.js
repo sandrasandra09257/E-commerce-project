@@ -1,0 +1,23 @@
+const express = require("express");
+const {
+  addProducts,
+  getAllProducts,
+  getIdProducts,
+  deleteProducts
+} = require("../Controllers/productController");
+const upload = require("../Middleware/multer");
+
+const productRouter = express.Router();
+
+
+productRouter.post("/add", upload.array("images", 4), addProducts);
+
+
+productRouter.get("/list", getAllProducts);
+
+
+productRouter.get("/:id", getIdProducts);
+
+productRouter.delete("/remove/:id", deleteProducts);
+
+module.exports = productRouter;
