@@ -5,47 +5,68 @@ import { toast } from "react-toastify";
 const backend_url = process.env.REACT_APP_BACKEND_URL;
 
 const AddItems = ({ token }) => {
-  const [images, setImages] = useState([]);
+  const [image, setImages] = useState([]); // ✅ only two variables
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [sizes, setSizes] = useState([]);
   const [bestSeller, setBestSeller] = useState(false);
 
+  // ✅ Handle image upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    setImages(files);
+    setImages((prev) => [...prev, ...files]); 
   };
 
+  // ✅ Handle size selection
   const handleSizeClick = (size) => {
     setSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     );
   };
 
+  // ✅ Submit product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    images.forEach((file) => formData.append("images", file));
+
+    // Append images
+    image.forEach((file) => formData.append("images", file));
+
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
     formData.append("subCategory", subCategory);
     formData.append("price", price);
+    formData.append("quantity", quantity);
     formData.append("sizes", JSON.stringify(sizes));
     formData.append("bestSeller", bestSeller);
 
     try {
       await axios.post(`${backend_url}/product/add`, formData, {
-        headers: { token },
+         headers: {
+    Authorization: `Bearer ${token}`, 
+  },
       });
-      toast.success("✅ Product added successfully!",{
-        autoClose: 1000,
-      });
+
+      toast.success("✅ Product added successfully!", { autoClose: 1000 });
+
+      // ✅ Reset form after success
+      setImages([]);
+      setName("");
+      setDescription("");
+      setCategory("");
+      setSubCategory("");
+      setPrice("");
+      setQuantity("");
+      setSizes([]);
+      setBestSeller(false);
     } catch (error) {
+      console.error("❌ Upload error:", error);
       toast.error("❌ Failed to add product!");
     }
   };
@@ -66,9 +87,8 @@ const AddItems = ({ token }) => {
         ))}
       </div>
 
-    
       <form onSubmit={handleSubmit} className="space-y-6">
-        
+        {/* Product Name */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Product Name
@@ -82,7 +102,7 @@ const AddItems = ({ token }) => {
           />
         </div>
 
-
+        {/* Product Description */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Product Description
@@ -96,7 +116,7 @@ const AddItems = ({ token }) => {
           />
         </div>
 
-        
+        {/* Category & Price */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
             <label className="block text-gray-700 font-medium mb-1">
@@ -110,6 +130,7 @@ const AddItems = ({ token }) => {
               <option value="">Select</option>
               <option value="men">Men</option>
               <option value="women">Women</option>
+              <option value="kids">Kids</option>
             </select>
           </div>
 
@@ -123,8 +144,9 @@ const AddItems = ({ token }) => {
               onChange={(e) => setSubCategory(e.target.value)}
             >
               <option value="">Select</option>
-              <option value="shirts">Shirts</option>
-              <option value="pants">Pants</option>
+              <option value="Bottomwear">Bottomwear</option>
+              <option value="topwear">Topwear</option>
+              <option value="winterwear">Winterwear</option>
             </select>
           </div>
 
@@ -142,7 +164,7 @@ const AddItems = ({ token }) => {
           </div>
         </div>
 
-    
+        {/* Sizes */}
         <div>
           <label className="block text-gray-700 font-medium mb-2">
             Product Sizes
@@ -165,7 +187,7 @@ const AddItems = ({ token }) => {
           </div>
         </div>
 
-        
+        {/* Best Seller */}
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -176,7 +198,7 @@ const AddItems = ({ token }) => {
           <label className="text-gray-700 font-medium">Add To Best Seller</label>
         </div>
 
-    
+        {/* Submit */}
         <button
           type="submit"
           className="mt-4 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-8 py-3 rounded-lg shadow-md"

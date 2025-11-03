@@ -13,13 +13,12 @@ exports.addProducts = async (req, res) => {
       sizes,
       bestSeller,
       
+      
 
   
     
     } = req.body;
-
-    // ✅ Correct way to read uploaded images
-    const images = req.files || [];
+    const image = req.files || [];
 
     let parsedSizes = [];
     if (sizes) {
@@ -32,7 +31,7 @@ exports.addProducts = async (req, res) => {
 
     // ✅ Upload images to Cloudinary
     const imageUrls = await Promise.all(
-      images.map(async (file) => {
+      image.map(async (file) => {
         const result = await cloudinary.uploader.upload(file.path, {
           resource_type: "image",
         });
@@ -98,6 +97,3 @@ exports.deleteProducts = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
-
-
-
