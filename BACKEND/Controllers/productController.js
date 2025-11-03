@@ -97,3 +97,7 @@ exports.deleteProducts = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+// ✅ SEARCH PRODUCTS
+
+
+    
